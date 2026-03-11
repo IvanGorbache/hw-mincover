@@ -6,3 +6,4 @@ https://en.wikipedia.org/wiki/Vertex_cover.
 
 Write extensive tests for your function, including tests on large random graphs.
 
+The function should finish in at most 1 second on graphs with at most 50 vertices and 1000 edges.
