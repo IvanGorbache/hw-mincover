@@ -20,12 +20,22 @@ def mincover(graph: nx.Graph) -> set:
     >>> len(mincover(nx.Graph([])))
     0
     """
-    var = {node: cvxpy.Variable(boolean=True) for node in graph.nodes}
-    objective = cvxpy.sum(var[node] for node in graph.nodes)
-    constraints = [var[u] + var[v] >= 1 for u, v in graph.edges]
-    prob = cvxpy.Problem(cvxpy.Minimize(objective), constraints)
+    if graph.number_of_nodes() == 0:
+        return set()
+
+    nodes = list(graph.nodes())
+    node_index = {node: i for i, node in enumerate(nodes)}
+
+    x = cvxpy.Variable(len(nodes), boolean=True)
+
+    constraints = []
+    for u, v in graph.edges():
+        constraints.append(x[node_index[u]] + x[node_index[v]] >= 1)
+
+    prob = cvxpy.Problem(cvxpy.Minimize(cvxpy.sum(x)), constraints)
     prob.solve(solver=cvxpy.SCIPY)
-    return {node for node, nodevar in var.items() if nodevar.value > 0}
+
+    return {nodes[i] for i in range(len(nodes)) if x.value[i] > 0.5}
 
 
 if __name__ == '__main__':
